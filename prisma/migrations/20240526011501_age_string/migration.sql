@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "kyc" ALTER COLUMN "age" SET DATA TYPE TEXT;

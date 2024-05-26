@@ -64,4 +64,9 @@ export class KycController {
     return this.veriffService.docVerify(document, documentBack);
   }
 
+  @Get('doc-details')
+  async getDoc(@Body() data){
+    return await this.veriffService.findDoc(data)
+  }
+
 }

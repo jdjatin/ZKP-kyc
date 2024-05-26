@@ -5,6 +5,7 @@ import { KycModule } from './kyc/kyc.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { ServeStaticModule } from '@nestjs/serve-static/dist/serve-static.module';
 import { join } from 'path';
+import { PrismaService } from './prisma/prisma.service';
 
 @Module({
   imports: [KycModule,
@@ -15,6 +16,6 @@ import { join } from 'path';
       rootPath: join(__dirname, '..', 'public'),
   })],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, PrismaService],
 })
 export class AppModule {}

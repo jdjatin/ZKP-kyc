@@ -6,6 +6,7 @@ import { firstValueFrom } from 'rxjs';
 import * as fs from 'fs';
 import * as crypto from 'crypto';
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
+import { PrismaService } from '../prisma/prisma.service';
 dotenv.config();
 
 @Injectable()
@@ -15,7 +16,9 @@ export class KycService {
   private readonly apiKey = process.env.API_KEY;
   private readonly apiUrl = 'https://api2.idanalyzer.com/quickscan';
 
-  constructor(private readonly httpService: HttpService) {}
+  constructor(private readonly httpService: HttpService,
+    private readonly prisma:PrismaService
+    ) {}
 
  
   async createVerificationSession(userData: any): Promise<any> {
@@ -135,9 +138,17 @@ export class KycService {
       const res = response.data;
       const age = res.data.age[0].value;
       if (age>= 19) {
+        const userHash = crypto.randomBytes(20).toString('hex')
+        const saved_rec = await this.prisma.kyc.create({
+          data:{
+            age:age,
+            hash:userHash
+          }
+        });
+        console.log(saved_rec)
         return {
           "age":age,
-          "hash": crypto.randomBytes(20).toString('hex'),
+          "hash": userHash,
           "user image":`${process.env.ENV}/user-image.jpg`
         }
       }
@@ -156,5 +167,19 @@ export class KycService {
       }
     }
   }
+
+
+  async findDoc(data){
+    const dbData =  await this.prisma.kyc.findMany({
+      where:{
+        hash:data.hash
+      }
+    }) 
+    return {
+      ...dbData,
+      "user_image":`${process.env.ENV}/user-image.jpg`
+    }
+  }
+
 
 }
